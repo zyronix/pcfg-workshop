@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PCFG Workshop</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="vendor/marked.min.js"></script>
+  <script src="app.js"></script>
+</head>
+<body>
+  <a class="skip" href="#content">Skip to content</a>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="brand">PCFG Workshop</div>
+      <nav aria-label="Course">
+        <ol id="nav-list"></ol>
+      </nav>
+      <button id="reset" type="button" class="reset">Reset my answers</button>
+    </aside>
+    <div class="page">
+      <div id="progress" class="progress" hidden>
+        <div class="progress-track"><div class="progress-fill"></div></div>
+        <span class="progress-text"></span>
+      </div>
+      <main id="content" tabindex="-1"><p class="loading">Loading&hellip;</p></main>
+      <nav id="pager" class="pager" aria-label="Previous and next page"></nav>
+    </div>
+  </div>
+</body>
+</html>
