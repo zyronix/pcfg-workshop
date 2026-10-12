@@ -1,6 +1,6 @@
 # Step 2: Targetted PCFG with merging
 
-With a general ruleset like you created in step 1. You can more efficiently crack password then just with a dictionary and hashcat rules. You can also created a targetted ruleset. You might have some personal information of you suspect and want to convert that information into real passwords.
+With a general ruleset like you created in step 1. You can more efficiently crack password then just with a dictionary and hashcat rules. You can also created a targetted ruleset. You might have some personal information of your target and want to convert that information into real passwords.
 
 The general flow for this:
 
@@ -17,7 +17,9 @@ We'll be learning the structure of passwords from the very famous rockyou leak. 
 
 Generally speaking Rockyou might not be the best in real password cracking. The passwords in this leak are generally very weak. Best to select a leak with passwords that are generally close to the structure what you are expecting for your target.
 
-[rockyou-1m.txt](files/rockyou-1m.txt) Source [Weakpass](https://weakpass.com/wordlists/rockyou.txt#download)
+Download: [rockyou-1m.txt](files/rockyou-1m.txt) 
+
+Now train on this file, takes 1-2 minutes to train:
 
 ```
 python3 trainer.py -t rockyou-1m.txt -r General -c 1.0 -e utf-8
@@ -40,7 +42,7 @@ Your target is **Johan de Vries**. This is what you know about him:
 Create `johan.txt` with the following rules:
 
 - one fact per line
-- Casing doesn't matter
+- Casing doesn't matter.
 - from the dates, keep only the year
 
 ```question
@@ -71,20 +73,46 @@ ask: Can you use the ruleset `Johan` directly for password cracking?
 - [x] No, it just prints the personal information as-is, these aren't really passwords yet
 ```
 
-## 4. Merge only the terminals
-
-Merge `Johan` into `General` and keep the structures of `General`:
+## 4. Merge Rulesets
+Merge `Johan` into `General`.
 
 ```
+python3 ../pcfg-tools/merge_rules.py -r General -i Johan -o General_Johan -w 0.9 -D ./Rules
+```
+
+Take a look at the `grammar.txt` file of the newly create ruleset:
+
+```
+head -10 Rules/General_Johan/Grammar/grammar.txt
+```
+
+See the second grammar:
+
+```
+Y1	0.30000930189758712174
+```
+
+```question
+id: s2-wrong-merge
+ask: What will this grammar starts to generate?
+- [x] It will generate plain years, like 1987 without any modifications.
+- [ ] It is just a placeholder and will not do any thing
+explain: Take a look into Rules/Johan/Grammar/grammar.txt. Because johan.txt contained plain years, there will be a grammar Y1 and thus if you use the Ruleset this way, it will also start generating candidates like 2015. Those are not really candidates that we want. We want something like amsterdam2015.
+```
+
+Merge `Johan` into `General`, but now with the `--merge_base_only` option:
+
+```
+rm -rf Rules/General_Johan
 python3 ../pcfg-tools/merge_rules.py -r General -i Johan -o General_Johan -w 0.9 --merge_base_only -D ./Rules
 python3 ../pcfg-tools/merge_rules.py --help
 ```
 
 ```question
 id: s2-base-only
-ask: Why do we use `--merge_base_only`?
+ask: What is the effect of `--merge_base_only`?
 - [ ] It makes the merge run faster
-- [x] Johan's grammar (bare words, bare years) are not real password structures, so you don't want to use them.
+- [x] This option will only merge the base structures like A and Y
 - [ ] Without it, the merge loses the years
 - [ ] The general ruleset has no capitalization
 explain: Without it, "a bare five-letter word" and "a bare year" would take a large share of the grammar. The capitalization that the general dataset would have, would also be lost.
@@ -97,6 +125,8 @@ head -5 Rules/General_Johan/Alpha/5.txt
 head -5 Rules/General_Johan/Years/1.txt
 ```
 
+You'll see data that you trained on but also new terms from the General ruleset.
+
 ```question
 id: s2-weight
 ask: What does `-w 0.9` do?
@@ -106,7 +136,7 @@ ask: What does `-w 0.9` do?
 explain: Each probability becomes 0.9 x Johan + 0.1 x General. That puts Johan's words and years at the top of their lists.
 ```
 
-This whole concept of merging is based on ["Using Personal Information in Targeted Grammar-Based Probabilistic Password Attacks"](https://inria.hal.science/hal-01716395/document) by Shiva Houshmand and Sudhir Aggarwal.
+> **Background info:** This whole concept of merging is based on ["Using Personal Information in Targeted Grammar-Based Probabilistic Password Attacks"](https://inria.hal.science/hal-01716395/document) by Shiva Houshmand and Sudhir Aggarwal.
 
 ## 5. Crack
 
@@ -117,7 +147,7 @@ Johan's password: [step2.hash](files/step2.hash)
 ```
 
 ```
-python3 pcfg_guesser.py -r General_Johan 2>/dev/null | ../hashcat/hashcat -m 0 step2.hash
+python3 pcfg_guesser.py -r General_Johan | ../hashcat/hashcat -m 0 step2.hash
 ../hashcat/hashcat -m 0 step2.hash --show
 ```
 

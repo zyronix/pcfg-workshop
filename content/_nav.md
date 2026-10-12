@@ -4,3 +4,4 @@
 - [Step 1: PCFG basics](step1.md)
 - [Step 2: Targetted PCFG with merging](step2.md)
 - [Step 3: Hashcat PCFG](step3.md)
+- [Step 4: Hashtopolis PCFG](step4.md)
