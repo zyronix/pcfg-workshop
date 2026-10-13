@@ -6,7 +6,7 @@ The workshop consists of 3 excercises.
 
 | Step | You will |
 |---|---|
-| [1. PCFG basics](step.md) | Train on a small set of passwords, understand what grammars and terminals are. And run your first PCFG attack! |
+| [1. PCFG basics](step1.md) | Train on a small set of passwords, understand what grammars and terminals are. And run your first PCFG attack! |
 | [2. Targeted cracking](step2.md) | Create a targetted ruleset by integrating personal information into your rulesets. |
 | [3. Hashcat PCFG](step3.md) | Learn how to use the rulefiles in Hashcat and what hint files are. |
 | [4. Hashtopolis PCFG](step4.md) | Learn how to use Hashcat' PCFG with Hashtopolis |
